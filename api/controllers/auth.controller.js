@@ -1,7 +1,7 @@
 import User from "../models/user.model.js";
 import bycryptjs from "bcryptjs";
 
-export const signUp = async (req, res) => {
+export const signUp = async (req, res, next) => {
   const { username, email, password } = req.body;
   const emailRegex = /\S+@\S+\.\S+/;
   if (!emailRegex.test(email)) {
@@ -23,6 +23,6 @@ export const signUp = async (req, res) => {
       .status(201)
       .json({ message: "User created successfully", user: newUser });
   } catch (error) {
-    res.status(500).json({ message: "Error creating user", error });
+    next(error);
   }
 };
