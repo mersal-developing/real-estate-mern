@@ -13,11 +13,8 @@ export const signUp = async (req, res, next) => {
 
   try {
     const existingUser = await User.findOne({ $or: [{ email }, { username }] });
-    if (existingUser) {
-      return res
-        .status(400)
-        .json({ message: "Username or email already exists" });
-    }
+    if (existingUser)
+      return next(errorHandler(res, 400, "Username or email already exists"));
 
     const newUser = new User({ username, email, password: hashedPassWord });
     await newUser.save();
@@ -33,14 +30,16 @@ export const signIn = async (req, res, next) => {
   const { email, password } = req.body;
   try {
     const existingUser = await User.findOne({ email });
-    if (!existingUser) return next(errorHandler(404, "User not found!"));
+    if (!existingUser) return next(errorHandler(res, 401, "User not found"));
 
     const validPassword = bycryptjs.compareSync(
       password,
       existingUser.password
     );
 
-    if (!validPassword) return next(errorHandler(401, "wrong credentials!"));
+    if (!validPassword)
+      return next(errorHandler(res, 401, "wrong credentials"));
+
     const token = jwt.sign({ id: existingUser._id }, process.env.JWT_SECRET);
 
     const { password: pass, ...resUserData } = existingUser._doc;
