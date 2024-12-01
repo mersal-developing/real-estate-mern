@@ -34,9 +34,6 @@ export default function Header() {
           <Link to="/sign-in">
             <li className="link">Login</li>
           </Link>
-          <Link to="/sign-up">
-            <li className="link">Sign Up</li>
-          </Link>
           <Link to="/"></Link>
         </ul>
       </div>
