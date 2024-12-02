@@ -32,7 +32,7 @@ export default function Header() {
             <li className="link">About</li>
           </Link>
           <Link to="/sign-in">
-            <li className="link">Login</li>
+            <li className="link">Sign In</li>
           </Link>
           <Link to="/"></Link>
         </ul>
