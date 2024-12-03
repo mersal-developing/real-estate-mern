@@ -5,6 +5,7 @@ import SignUp from "./pages/SignUp";
 import About from "./pages/About";
 import Profile from "./pages/Profile";
 import Header from "./components/Header";
+import RouteGuard from "./components/PrivateRoute";
 import "./App.css";
 
 export default function App() {
@@ -13,10 +14,15 @@ export default function App() {
       <Header />
       <Routes>
         <Route path="/" element={<Home />}></Route>
-        <Route path="/sign-in" element={<SignIn />}></Route>
-        <Route path="/sign-up" element={<SignUp />}></Route>
+        <Route element={<RouteGuard isPrivate={false} />}>
+          <Route path="/sign-in" element={<SignIn />} />
+          <Route path="/sign-up" element={<SignUp />} />
+        </Route>
+
         <Route path="/about" element={<About />}></Route>
-        <Route path="/Profile" element={<Profile />}></Route>
+        <Route element={<RouteGuard isPrivate={true} />}>
+          <Route path="/Profile" element={<Profile />}></Route>
+        </Route>
       </Routes>
     </BrowserRouter>
   );

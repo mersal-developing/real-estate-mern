@@ -27,7 +27,7 @@ export default function Oauth() {
         }),
       });
 
-      const data = res.json();
+      const data = await res.json();
       dispatch(singInSuccess(data));
       navigate("/");
     } catch (error) {
