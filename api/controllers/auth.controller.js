@@ -6,9 +6,23 @@ import jwt from "jsonwebtoken";
 export const signUp = async (req, res, next) => {
   const { username, email, password } = req.body;
   const emailRegex = /\S+@\S+\.\S+/;
+
   if (!emailRegex.test(email)) {
-    return res.status(400).json({ message: "Invalid email format" });
+    return next(errorHandler(res, 400, "Invalid email format"));
   }
+
+  if (!username || username.length < 4) {
+    return next(
+      errorHandler(res, 400, "Username must be at least 4 characters long")
+    );
+  }
+
+  if (!password || password.length < 6) {
+    return next(
+      errorHandler(res, 400, "Password must be at least 6 characters long")
+    );
+  }
+
   const hashedPassWord = bycryptjs.hashSync(password, 10);
 
   try {
@@ -18,9 +32,8 @@ export const signUp = async (req, res, next) => {
 
     const newUser = new User({ username, email, password: hashedPassWord });
     await newUser.save();
-    res
-      .status(201)
-      .json({ message: "User created successfully", user: newUser });
+
+    handleSignInSuccess(res, newUser, true);
   } catch (error) {
     next(error);
   }
@@ -64,19 +77,25 @@ export const oauth = async (req, res, next) => {
       });
 
       await newUser.save();
-      handleSignInSuccess(res, newUser);
+      handleSignInSuccess(res, newUser, true);
     }
   } catch (error) {
     next(error);
   }
 };
 
-const handleSignInSuccess = (res, user) => {
+const handleSignInSuccess = (res, user, isSignUp = false) => {
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
   const { password: pass, ...resUserData } = user._doc;
-
-  res
-    .cookie("access_token", token, { httpOnly: true })
-    .status(200)
-    .json(resUserData);
+  if (isSignUp) {
+    res
+      .cookie("access_token", token, { httpOnly: true })
+      .status(200)
+      .json({ message: "User created successfully", user: resUserData });
+  } else {
+    res
+      .cookie("access_token", token, { httpOnly: true })
+      .status(200)
+      .json(resUserData);
+  }
 };
